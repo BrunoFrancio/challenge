@@ -1,0 +1,52 @@
+
+services:
+  # Serviço para o ambiente Laravel
+  app:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    container_name: laravel_app
+    ports:
+      - "8000:80"
+    environment:
+      - DB_CONNECTION=mysql
+      - DB_HOST=db
+      - DB_PORT=3306
+      - DB_DATABASE=fitnessfoods
+      - DB_USERNAME=user
+      - DB_PASSWORD=secret
+    volumes:
+      - .:/var/www/html
+    depends_on:
+      - db
+
+  # Serviço MySQL
+  db:
+    image: mysql:5.7
+    container_name: mysql_db
+    ports:
+      - "3306:3306"
+    environment:
+      MYSQL_DATABASE: fitnessfoods
+      MYSQL_USER: user
+      MYSQL_PASSWORD: secret
+      MYSQL_ROOT_PASSWORD: root
+    volumes:
+      - db_data:/var/lib/mysql
+
+  # Serviço phpMyAdmin
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    container_name: phpmyadmin
+    restart: always
+    ports:
+      - "8080:80"
+    environment:
+      PMA_HOST: db
+      PMA_PORT: 3306
+      MYSQL_ROOT_PASSWORD: root
+    depends_on:
+      - db
+
+volumes:
+  db_data:
